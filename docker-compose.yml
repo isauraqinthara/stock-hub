@@ -1,0 +1,51 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stockhub_app
+    env_file:
+      - .env
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+    networks:
+      - stockhub-network
+
+  db:
+    image: mysql:5.7
+    container_name: stockhub_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: stockhub
+      MYSQL_USER: stockhubuser
+      MYSQL_PASSWORD: stockhubpassword
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - stockhub-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: stockhub_phpmyadmin
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "8000:80"
+    depends_on:
+      - db
+    networks:
+      - stockhub-network
+
+volumes:
+  db_data:
+
+networks:
+  stockhub-network:
+
