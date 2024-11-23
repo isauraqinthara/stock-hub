@@ -3,10 +3,10 @@ name: Laravel CI/CD Pipeline
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   test:
@@ -48,7 +48,7 @@ jobs:
       - name: Run End-to-End Tests (Laravel Dusk)
         env:
           APP_ENV: testing
-          APP_KEY: base64:xxxxxxxxxxxxxxxxxxxxxxxxxxx  # Ganti dengan APP_KEY yang valid
+          APP_KEY: base64:SNzPdetOFSUqu+XhDrVaGkzsMkXUMQ4tK4AfSdJZoog=  # Ganti dengan APP_KEY yang valid
         run: php artisan dusk
 
   deploy:
