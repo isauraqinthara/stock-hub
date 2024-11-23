@@ -1,5 +1,17 @@
 version: '3'
 services:
+  nginx:
+    image: nginx:latest
+    container_name: stockhub_nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - stockhub-network
+    ports:
+      - "80:80"
+
   app:
     build:
       context: .
@@ -10,7 +22,7 @@ services:
     volumes:
       - .:/var/www/html
     ports:
-      - "80:80"
+      - "9000:9000"
     depends_on:
       - db
     networks:

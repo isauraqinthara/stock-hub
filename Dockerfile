@@ -1,7 +1,6 @@
-# Menggunakan base image PHP 8.2 dengan FPM untuk Laravel
 FROM php:8.1-fpm
 
-# Install dependencies dan PHP extension yang dibutuhkan untuk Laravel
+# Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -14,8 +13,10 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+# Install a specific version of Composer compatible with PHP 8.1
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+    && php composer-setup.php --version=2.5.8 --install-dir=/usr/local/bin --filename=composer \
+    && php -r "unlink('composer-setup.php');"
 
 # Set working directory
 WORKDIR /var/www/html
@@ -23,20 +24,22 @@ WORKDIR /var/www/html
 # Copy project files
 COPY . .
 
-# Menyalin izin untuk direktori Laravel agar storage dan cache dapat ditulis
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+# Ensure correct permissions
+RUN chmod -R 775 /var/www/html \
+    && chown -R www-data:www-data /var/www/html
 
-# Menyimpan environment file (.env)
+# Copy and configure environment file
 COPY .env.example .env
 
-# Install dependencies Laravel
+# Install Laravel dependencies
+ENV COMPOSER_MEMORY_LIMIT=-1
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Generate Laravel APP_KEY
+# Generate application key
 RUN php artisan key:generate
 
-# Expose port 80 untuk mengakses aplikasi melalui Nginx
+# Expose port 80
 EXPOSE 80
 
-# Perintah untuk memulai PHP-FPM saat container berjalan
+# Start PHP-FPM
 CMD ["php-fpm"]
