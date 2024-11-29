@@ -4,16 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Contracts\View\Factory;
 
 class ProductController extends Controller
 {
-    public function index(): \Illuminate\View\View
+    public function index(): Factory
     {
         $products = Product::all();
         return view('products.index', compact('products'));
     }
 
-    public function create(): \Illuminate\View\View
+    public function create(): Factory
     {
         return view('products.create');
     }
@@ -30,7 +31,7 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Product added successfully');
     }
 
-    public function edit(Product $product): \Illuminate\View\View
+    public function edit(Product $product): Factory
     {
         return view('products.edit', compact('product'));
     }
