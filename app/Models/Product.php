@@ -9,5 +9,8 @@ class Product extends Model
 {
     use HasFactory;
     protected $fillable = ['name', 'quantity', 'price'];
-    
+    // This will block mass assignment on all attributes
+    protected $guarded = [];
+
+
 }
