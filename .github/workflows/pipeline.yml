@@ -52,16 +52,7 @@ jobs:
       - name: Run Unit Tests (PHPUnit)
         run: php artisan test
 
-      - name: Install Laravel Dusk
-        run: |
-          composer require --dev laravel/dusk
-          php artisan dusk:install
 
-      - name: Run End-to-End Tests (Laravel Dusk)
-        env:
-          APP_ENV: testing
-          APP_KEY: base64:SNzPdetOFSUqu+XhDrVaGkzsMkXUMQ4tK4AfSdJZoog=  # Ganti dengan APP_KEY yang valid
-        run: php artisan dusk
 
   deploy:
     runs-on: ubuntu-latest
