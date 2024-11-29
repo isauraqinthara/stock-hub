@@ -1,3 +1,5 @@
+<?php
+
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ProductFactory extends Factory
