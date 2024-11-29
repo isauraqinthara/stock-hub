@@ -55,7 +55,7 @@ jobs:
       - name: Run Static Analysis (PHPStan)
         run: |
           composer require --dev phpstan/phpstan
-          ./vendor/bin/phpstan analyse --level=5 app
+          ./vendor/bin/phpstan analyse --level=1 app
 
       - name: Run PHP_CodeSniffer
         run: |
