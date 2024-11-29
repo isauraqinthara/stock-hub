@@ -8,13 +8,13 @@ use Illuminate\Contracts\View\Factory;
 
 class ProductController extends Controller
 {
-    public function index(): Factory
+    public function index(): Factory|Illuminate\Contracts\View\View
     {
         $products = Product::all();
         return view('products.index', compact('products'));
     }
 
-    public function create(): Factory
+    public function create(): Factory|Illuminate\Contracts\View\View
     {
         return view('products.create');
     }
@@ -31,7 +31,7 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Product added successfully');
     }
 
-    public function edit(Product $product): Factory
+    public function edit(Product $product): Factory|Illuminate\Contracts\View\View
     {
         return view('products.edit', compact('product'));
     }
