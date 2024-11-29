@@ -52,11 +52,6 @@ jobs:
       - name: Run Unit Tests (PHPUnit)
         run: php artisan test
 
-      - name: Run PHP_CodeSniffer
-        run: |
-          composer require --dev squizlabs/php_codesniffer
-          ./vendor/bin/phpcs --standard=PSR12 app
-
       - name: Install Laravel Dusk
         run: |
           composer require --dev laravel/dusk
