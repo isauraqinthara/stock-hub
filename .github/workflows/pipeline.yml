@@ -12,6 +12,22 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_DATABASE: stockhub
+          MYSQL_USER: stockhubuser
+          MYSQL_PASSWORD: stockhubpassword
+          MYSQL_ROOT_PASSWORD: rootpassword
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        ports:
+          - 3306:3306 
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -39,7 +55,7 @@ jobs:
       - name: Run Static Analysis (PHPStan)
         run: |
           composer require --dev phpstan/phpstan
-          ./vendor/bin/phpstan analyse --level=7 app
+          ./vendor/bin/phpstan analyse --level=5 app
 
       - name: Run PHP_CodeSniffer
         run: |

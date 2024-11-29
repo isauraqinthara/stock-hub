@@ -27,6 +27,13 @@ services:
       - db
     networks:
       - stockhub-network
+    command: >
+        sh -c "
+        php artisan config:cache &&
+        php artisan migrate --force &&
+        chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache &&
+        php-fpm
+        "
 
   db:
     image: mysql:5.7
