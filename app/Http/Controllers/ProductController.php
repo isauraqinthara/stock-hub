@@ -7,18 +7,18 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(): \Illuminate\View\View
     {
         $products = Product::all();
         return view('products.index', compact('products'));
     }
 
-    public function create()
+    public function create(): \Illuminate\View\View
     {
         return view('products.create');
     }
 
-    public function store(Request $request)
+    public function store(Request $request): \Illuminate\Http\RedirectResponse
     {
         $request->validate([
             'name' => 'required',
@@ -30,12 +30,12 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Product added successfully');
     }
 
-    public function edit(Product $product)
+    public function edit(Product $product): \Illuminate\View\View
     {
         return view('products.edit', compact('product'));
     }
 
-    public function update(Request $request, Product $product)
+    public function update(Request $request, Product $product): \Illuminate\Http\RedirectResponse
     {
         $request->validate([
             'name' => 'required',
@@ -47,7 +47,7 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Product updated successfully');
     }
 
-    public function destroy(Product $product)
+    public function destroy(Product $product): \Illuminate\Http\RedirectResponse
     {
         $product->delete();
         return redirect()->route('products.index')->with('success', 'Product deleted successfully');
