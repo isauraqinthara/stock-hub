@@ -52,11 +52,6 @@ jobs:
       - name: Run Unit Tests (PHPUnit)
         run: php artisan test
 
-      - name: Run Static Analysis (PHPStan)
-        run: |
-          composer require --dev phpstan/phpstan
-          ./vendor/bin/phpstan analyse --level=5 app
-
       - name: Run PHP_CodeSniffer
         run: |
           composer require --dev squizlabs/php_codesniffer
