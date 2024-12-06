@@ -69,10 +69,28 @@ jobs:
         run: |
           php artisan migrate --force
           php artisan db:seed
-  
-      - name: Install Chromedriver
-        run: php artisan dusk:chrome-driver
-  
+
+      - name: Install Google Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
+      - name: Install Laravel Dusk
+        run: |
+          composer require --dev laravel/dusk
+          php artisan dusk:install
+
+      - name: Download Chromedriver
+        run: |
+          CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+' | head -1)
+          CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION)
+          curl -s -o chromedriver.zip https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
+          unzip chromedriver.zip -d ./vendor/laravel/dusk/bin/
+          chmod +x ./vendor/laravel/dusk/bin/chromedriver
+
+      - name: Verify Chromedriver Path
+        run: ls -la ./vendor/laravel/dusk/bin/
+
       - name: Generate APP_KEY
         run: php artisan key:generate
 
@@ -88,22 +106,10 @@ jobs:
       - name: Run PHP_CodeSniffer
         run: ./vendor/bin/phpcs --standard=PSR12 app
 
-      - name: Install Laravel Dusk
-        run: |
-          composer require --dev laravel/dusk
-          php artisan dusk:install
-      
-      - name: Skip Laravel Dusk in CI
-        if: env.CI == 'true'
-        run: echo "Skipping Laravel Dusk tests in CI/CD pipeline."
-
-
-      - name: Run End-to-End Tests (Laravel Dusk)
+      - name: Run Laravel Dusk Tests
         env:
           APP_ENV: testing
-        run: |
-          php artisan key:generate
-          php artisan dusk --env=testing
+        run: php artisan dusk
 
   deploy:
     runs-on: ubuntu-latest
