@@ -70,6 +70,19 @@ jobs:
           php artisan migrate --force
           php artisan db:seed
 
+      - name: Install Google Chrome
+        run: |
+            sudo apt-get update
+            sudo apt-get install -y google-chrome-stable
+  
+      - name: Install Chromedriver
+        run: php artisan dusk:chrome-driver
+  
+      - name: Ensure Chromedriver is in Path
+        run: |
+            sudo cp ./vendor/laravel/dusk/bin/chromedriver-linux /usr/local/bin/chromedriver
+            sudo chmod +x /usr/local/bin/chromedriver
+  
       - name: Generate APP_KEY
         run: php artisan key:generate
 
@@ -95,7 +108,7 @@ jobs:
           APP_ENV: testing
         run: |
           php artisan key:generate
-          php artisan dusk
+          php artisan dusk --no -tty
 
   deploy:
     runs-on: ubuntu-latest
