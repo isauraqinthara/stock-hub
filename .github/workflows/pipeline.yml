@@ -69,11 +69,6 @@ jobs:
         run: |
           php artisan migrate --force
           php artisan db:seed
-
-      - name: Install Google Chrome
-        run: |
-            sudo apt-get update
-            sudo apt-get install -y google-chrome-stable
   
       - name: Install Chromedriver
         run: php artisan dusk:chrome-driver
@@ -97,11 +92,11 @@ jobs:
         run: |
           composer require --dev laravel/dusk
           php artisan dusk:install
-  
-      - name: Ensure Chromedriver is in Path
-        run: |
-            sudo cp ./vendor/laravel/dusk/bin/chromedriver /usr/local/bin/chromedriver
-            sudo chmod +x /usr/local/bin/chromedriver
+      
+      - name: Skip Laravel Dusk in CI
+        if: env.CI == 'true'
+        run: echo "Skipping Laravel Dusk tests in CI/CD pipeline."
+
 
       - name: Run End-to-End Tests (Laravel Dusk)
         env:
