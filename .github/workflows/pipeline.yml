@@ -32,6 +32,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Cache Composer Dependencies
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
       - name: Setup PHP Environment
         uses: shivammathur/setup-php@v2
         with:
@@ -43,8 +51,24 @@ jobs:
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist
 
-      - name: Set Up Environment
-        run: cp .env.example .env
+      - name: Configure Testing Environment
+        run: |
+          cp .env.example .env
+          sed -i 's/DB_DATABASE=.*/DB_DATABASE=stockhub/' .env
+          sed -i 's/DB_USERNAME=.*/DB_USERNAME=stockhubuser/' .env
+          sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=stockhubpassword/' .env
+
+      - name: Run Database Migrations and Seed
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: stockhub
+          DB_USERNAME: stockhubuser
+          DB_PASSWORD: stockhubpassword
+        run: |
+          php artisan migrate --force
+          php artisan db:seed
 
       - name: Generate APP_KEY
         run: php artisan key:generate
@@ -53,14 +77,10 @@ jobs:
         run: php artisan test
 
       - name: Run Static Analysis (PHPStan)
-        run: |
-          composer require --dev phpstan/phpstan
-          ./vendor/bin/phpstan analyse --level=1 app
+        run: ./vendor/bin/phpstan analyse --level=1 app
 
       - name: Run PHP_CodeSniffer
-        run: |
-          composer require --dev squizlabs/php_codesniffer
-          ./vendor/bin/phpcs --standard=PSR12 app
+        run: ./vendor/bin/phpcs --standard=PSR12 app
 
       - name: Install Laravel Dusk
         run: |
@@ -70,8 +90,9 @@ jobs:
       - name: Run End-to-End Tests (Laravel Dusk)
         env:
           APP_ENV: testing
-          APP_KEY: base64:SNzPdetOFSUqu+XhDrVaGkzsMkXUMQ4tK4AfSdJZoog=  # Ganti dengan APP_KEY yang valid
-        run: php artisan dusk
+        run: |
+          php artisan key:generate
+          php artisan dusk
 
   deploy:
     runs-on: ubuntu-latest
@@ -87,8 +108,8 @@ jobs:
         run: |
           echo "$SSH_KEY" > /tmp/vps_key
           chmod 600 /tmp/vps_key
-          scp -o StrictHostKeyChecking=no -i /tmp/vps_key -r * user@your_vps_ip:/path/to/project
-          ssh -o StrictHostKeyChecking=no -i /tmp/vps_key user@your_vps_ip << EOF
+          scp -o StrictHostKeyChecking=no -i /tmp/vps_key -r * user@your_vps_ip:/path/to/project || exit 1
+          ssh -o StrictHostKeyChecking=no -i /tmp/vps_key user@your_vps_ip << EOF || exit 1
             cd /path/to/project
             docker-compose down
             docker-compose up -d --build

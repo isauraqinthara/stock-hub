@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    // use HasFactory;
-    // protected $fillable = ['name', 'quantity', 'price'];
+    use HasFactory;
+    protected $fillable = ['name', 'quantity', 'price'];
     // This will block mass assignment on all attributes
-    protected $guarded = [];
+    // protected $guarded = [];
 
 
 }
