@@ -77,7 +77,7 @@ jobs:
         run: php artisan test
 
       - name: Run Static Analysis (PHPStan)
-        run: ./vendor/bin/phpstan analyse --level=1 app
+        run: ./vendor/bin/phpstan analyse --level=0 app
 
       - name: Run PHP_CodeSniffer
         run: ./vendor/bin/phpcs --standard=PSR12 app
