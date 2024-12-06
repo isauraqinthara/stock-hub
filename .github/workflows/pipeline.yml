@@ -103,7 +103,7 @@ jobs:
           APP_ENV: testing
         run: |
           php artisan key:generate
-          php artisan dusk --no-tty
+          php artisan dusk --env=testing
 
   deploy:
     runs-on: ubuntu-latest
