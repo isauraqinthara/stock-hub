@@ -97,14 +97,6 @@ jobs:
         run: |
           composer require --dev laravel/dusk
           php artisan dusk:install
-        
-      - name: Download Chromedriver
-        run: |
-            CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+')
-            CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION)
-            curl -s -o chromedriver.zip https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
-            unzip chromedriver.zip -d ./vendor/laravel/dusk/bin/
-            chmod +x ./vendor/laravel/dusk/bin/chromedriver
   
       - name: Ensure Chromedriver is in Path
         run: |
