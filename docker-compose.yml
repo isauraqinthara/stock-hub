@@ -35,7 +35,7 @@ services:
     container_name: stockhub_db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: root_password
       MYSQL_DATABASE: stockhub
       MYSQL_USER: stockhubuser
       MYSQL_PASSWORD: stockhubpassword
