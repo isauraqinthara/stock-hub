@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Foundation\Application;
 
 
 class ProductController extends Controller
