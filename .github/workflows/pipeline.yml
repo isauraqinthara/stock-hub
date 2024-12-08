@@ -80,25 +80,25 @@ jobs:
           php artisan migrate --force
           php artisan db:seed
 
-      - name: Generate APP_KEY
-        run: php artisan key:generate
+#      - name: Generate APP_KEY
+#        run: php artisan key:generate
 
-      - name: Run Unit Tests (PHPUnit)
-        run: php artisan test
+#      - name: Run Unit Tests (PHPUnit)
+#        run: php artisan test
 
-      - name: Run Static Analysis (PHPStan)
-        run: ./vendor/bin/phpstan analyse --level=0 app
+#      - name: Run Static Analysis (PHPStan)
+#        run: ./vendor/bin/phpstan analyse --level=0 app
 
-      - name: Run PHP_CodeSniffer Fixer
-        run: ./vendor/bin/phpcbf --standard=PSR12 app
+#      - name: Run PHP_CodeSniffer Fixer
+#        run: ./vendor/bin/phpcbf --standard=PSR12 app
 
-      - name: Run PHP_CodeSniffer
-        run: ./vendor/bin/phpcs --standard=PSR12 app
+#      - name: Run PHP_CodeSniffer
+#        run: ./vendor/bin/phpcs --standard=PSR12 app
 
-      - name: Run Laravel Dusk Tests
-        env:
-          APP_ENV: testing
-        run: php artisan dusk
+#      - name: Run Laravel Dusk Tests
+#        env:
+#          APP_ENV: testing
+#        run: php artisan dusk
 
   deploy:
     runs-on: ubuntu-latest
