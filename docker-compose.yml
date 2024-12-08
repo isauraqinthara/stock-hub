@@ -36,7 +36,7 @@ services:
     container_name: stockhub_db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: stockhub
       MYSQL_USER: stockhubuser
       MYSQL_PASSWORD: stockhubpassword
@@ -52,7 +52,7 @@ services:
       PMA_HOST: db
       PMA_USER: stockhubuser
       PMA_PASSWORD: stockhubpassword
-      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_ROOT_PASSWORD: rootpassword
     ports:
       - "8000:80"
     depends_on:
