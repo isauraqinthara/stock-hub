@@ -57,6 +57,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      - name: Print Current Directory
+        run: pwd
+
+      - name: List Files in Current Directory
+        run: ls -la
+        
       - name: Checkout Code
         uses: actions/checkout@v3
 
