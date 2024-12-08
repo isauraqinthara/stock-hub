@@ -35,7 +35,7 @@ jobs:
       - name: Install PHP Extensions
         run: sudo apt-get install -y php-zip
 
-      - name: Install Google Chrome
+      - name: Install Google Chrome (Stable Version)
         run: |
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable
@@ -43,10 +43,12 @@ jobs:
       - name: Debug Google Chrome Version
         run: google-chrome --version
 
-      - name: Download Chromedriver
+      - name: Download Chromedriver (Fallback to Latest)
         run: |
-          CHROME_VERSION=$(google-chrome --version | grep -oP '\d+' | head -1)
+          CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+' | head -1)
+          MAJOR_VERSION=$(echo "$CHROME_VERSION" | cut -d '.' -f 1)
           echo "Detected Chrome version: $CHROME_VERSION"
+<<<<<<< HEAD
           
           # Coba download versi spesifik Chromedriver
           CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION || echo "NO_VERSION_FOUND")
@@ -64,6 +66,18 @@ jobs:
             exit 1
           fi
           
+=======
+          echo "Detected Chrome major version: $MAJOR_VERSION"
+      
+          CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$MAJOR_VERSION")
+          if [[ -z "$CHROMEDRIVER_VERSION" || "$CHROMEDRIVER_VERSION" == *"<Error>"* ]]; then
+            echo "No exact Chromedriver version found for Chrome $MAJOR_VERSION. Falling back to the latest Chromedriver."
+            CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
+          fi
+      
+          echo "Using Chromedriver version: $CHROMEDRIVER_VERSION"
+          curl -s -o chromedriver.zip "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
+>>>>>>> 12624de9dcf66eeff7ae63c6b85620feb05d3ed3
           unzip -o chromedriver.zip -d ./vendor/laravel/dusk/bin/
           chmod +x ./vendor/laravel/dusk/bin/chromedriver
 
