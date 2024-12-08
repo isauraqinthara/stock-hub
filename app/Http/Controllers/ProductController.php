@@ -8,7 +8,7 @@ use Illuminate\Contracts\View\Factory;
 
 class ProductController extends Controller
 {
-    public function index(): Factory
+    public function index(): Factory|View|Application
     {
         $products = Product::all();
         return view('products.index', compact('products'));
