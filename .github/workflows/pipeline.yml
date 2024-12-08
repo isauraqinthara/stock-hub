@@ -111,6 +111,12 @@ jobs:
       - name: Debug SSH Connection
         run: ssh -vvv -o StrictHostKeyChecking=no -i /tmp/vps_key root@217.15.160.69 'echo "Debugging SSH connection"'
 
+      - name: Check VPS Key
+        run: |
+          ls -l /tmp/vps_key
+          cat /tmp/vps_key
+      
+        
       - name: Deploy to VPS
         env:
           SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
