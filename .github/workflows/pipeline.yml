@@ -3,10 +3,10 @@ name: Laravel CI/CD Pipeline
 on:
   push:
     branches:
-      - master
+      - ilham
   pull_request:
     branches:
-      - master
+      - ilham
 
 jobs:
   test:
