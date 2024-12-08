@@ -33,41 +33,24 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install PHP Extensions
-        run: sudo apt-get install -y php-zip
+        run: sudo apt-get install -y php-zip unzip
 
-      - name: Install Google Chrome
+      - name: Install Google Chrome Version 114
         run: |
           sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
+          wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_114.0.5735.90-1_amd64.deb
+          sudo apt-get install -y ./google-chrome-stable_114.0.5735.90-1_amd64.deb
 
-      - name: Debug Google Chrome Version
+      - name: Verify Installed Google Chrome Version
         run: google-chrome --version
 
-      - name: Download Chromedriver
+      - name: Install ChromeDriver Version 114
         run: |
-          CHROME_VERSION=$(google-chrome --version | grep -oP '\d+' | head -1)
-          echo "Detected Chrome version: $CHROME_VERSION"
-          
-          # Coba download versi spesifik Chromedriver
-          CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION || echo "NO_VERSION_FOUND")
-          
-          if [ "$CHROMEDRIVER_VERSION" = "NO_VERSION_FOUND" ]; then
-            echo "Chromedriver version not found for Chrome version $CHROME_VERSION. Using latest Chromedriver version instead."
-            CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
-          fi
-          
-          echo "Matching Chromedriver version: $CHROMEDRIVER_VERSION"
-          curl -s -o chromedriver.zip https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
-          
-          if [ ! -f chromedriver.zip ]; then
-            echo "Failed to download Chromedriver. Exiting."
-            exit 1
-          fi
-          
+          curl -s -o chromedriver.zip https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip
           unzip -o chromedriver.zip -d ./vendor/laravel/dusk/bin/
           chmod +x ./vendor/laravel/dusk/bin/chromedriver
 
-      - name: Verify Chromedriver Path
+      - name: Verify ChromeDriver Installation
         run: ls -la ./vendor/laravel/dusk/bin/
 
       - name: Install Dependencies
