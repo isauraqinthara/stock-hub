@@ -3,10 +3,17 @@ name: Laravel CI/CD Pipeline
 on:
   push:
     branches:
+<<<<<<< HEAD
       - irsyad
   pull_request:
     branches:
       - irsyad
+=======
+      - abc
+  pull_request:
+    branches:
+      - abc
+>>>>>>> b75c7a72aaaed91387839214d84821953de5c524
 
 jobs:
   test:
