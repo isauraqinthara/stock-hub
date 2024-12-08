@@ -35,13 +35,11 @@ jobs:
       - name: Install PHP Extensions
         run: sudo apt-get install -y php-zip unzip curl
 
-      - name: Install Google Chrome (Stable Version)
+      - name: Install Chrome (Pinned to Version 114)
         run: |
-          sudo apt-get update
-          sudo apt-get install -y wget
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          sudo dpkg -i google-chrome-stable_current_amd64.deb || sudo apt-get install -f -y
-
+          sudo apt install -y ./google-chrome-stable_current_amd64.deb
+          
       - name: Debug Google Chrome Version
         run: google-chrome --version
 
