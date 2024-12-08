@@ -65,3 +65,5 @@ volumes:
 
 networks:
   stockhub-network:
+    name : stockhub-network
+    driver: bridge
