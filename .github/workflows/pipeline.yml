@@ -100,33 +100,24 @@ jobs:
 #          APP_ENV: testing
 #        run: php artisan dusk
 
+jobs:
   deploy:
     runs-on: ubuntu-latest
-    needs: test
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Debug SSH Connection
-        run: ssh -vvv -o StrictHostKeyChecking=no -i /tmp/vps_key root@217.15.160.69 'echo "Debugging SSH connection"'
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
 
-      - name: Check VPS Key
-        run: |
-          ls -l /tmp/vps_key
-          cat /tmp/vps_key
-      
-        
-      - name: Deploy to VPS
+      - name: Deploy to VPS using Password
         env:
-          SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
         run: |
-          echo "$SSH_KEY" > /tmp/vps_key || exit 1
-          chmod 600 /tmp/vps_key || exit 1
-          ssh -o StrictHostKeyChecking=no -i /tmp/vps_key root@217.15.160.69 "mkdir -p /pso/stock-hub/" || exit 1
-          rsync -avz --exclude '.git' --exclude '.github' --exclude 'pipeline.yml' ./ root@217.15.160.69:/pso/stock-hub/ || exit 1
-          ssh -o StrictHostKeyChecking=no -i /tmp/vps_key root@217.15.160.69 << EOF
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@217.15.160.69 "echo 'Connected using password'"
+          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./ root@217.15.160.69:/pso/stock-hub/
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@217.15.160.69 << EOF
             cd /pso/stock-hub/
-            docker-compose down || exit 1
-            docker-compose up -d --build || exit 1
+            docker-compose down
+            docker-compose up -d --build
           EOF
