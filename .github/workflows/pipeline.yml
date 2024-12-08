@@ -72,10 +72,10 @@ jobs:
       - name: Remove Existing Chrome Versions
         run: sudo apt-get remove -y google-chrome-stable || true
 
-      - name: Install Google Chrome 114
+      - name: Install Latest Google Chrome
         run: |
-          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O google-chrome-stable_114.deb
-          sudo dpkg -i google-chrome-stable_114.deb || sudo apt-get -f install -y
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O google-chrome-stable.deb
+          sudo dpkg -i google-chrome-stable.deb || sudo apt-get -f install -y
           google-chrome --version
 
       - name: Debug Google Chrome Version
@@ -84,16 +84,20 @@ jobs:
       - name: Prepare Chromedriver Directory
         run: mkdir -p ./vendor/laravel/dusk/bin/
 
-      - name: Download Chromedriver for Chrome 114
+      - name: Download Matching ChromeDriver
         run: |
-          CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/)
+          CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+')
+          CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION%.*})
           echo "Matching Chromedriver version: $CHROMEDRIVER_VERSION"
           curl -s -o chromedriver.zip https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
           unzip -o chromedriver.zip -d ./vendor/laravel/dusk/bin/
           chmod +x ./vendor/laravel/dusk/bin/chromedriver
 
-      - name: Verify Chromedriver Path
-        run: ls -la ./vendor/laravel/dusk/bin/
+      - name: Verify Chrome and ChromeDriver Versions
+        run: |
+          google-chrome --version
+          ./vendor/laravel/dusk/bin/chromedriver --version
+
 
       - name: Run Unit Tests (PHPUnit)
         run: php artisan test
