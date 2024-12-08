@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Contracts\Foundation\Application;
+
 
 class ProductController extends Controller
 {
@@ -14,7 +17,7 @@ class ProductController extends Controller
         return view('products.index', compact('products'));
     }
 
-    public function create(): Factory
+    public function create(): Factory|View|Application
     {
         return view('products.create');
     }

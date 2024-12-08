@@ -26,39 +26,32 @@ jobs:
           --health-timeout=5s
           --health-retries=3
         ports:
-          - 3306:3306 
+          - 3306:3306
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Install PHP Extensions
-        run: sudo apt-get install -y php-zip unzip curl
+      - name: Remove Existing Chrome Versions
+        run: sudo apt-get remove -y google-chrome-stable || true
 
-      - name: Install Chrome (Pinned to Version 114)
+      - name: Install Google Chrome 114
         run: |
-          wget https://www.slimjet.com/chrome/download-chrome.php?file=files%2F114.0.5735.90%2Fgoogle-chrome-stable_current_amd64.deb -O google-chrome-stable_114.deb
-          sudo dpkg -i google-chrome-stable_114.deb
-          sudo apt-get -f install -y  # Fix any missing dependencies
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O google-chrome-stable_114.deb
+          sudo dpkg -i google-chrome-stable_114.deb || sudo apt-get -f install -y
+          google-chrome --version
 
       - name: Debug Google Chrome Version
         run: google-chrome --version
 
-      - name: Download Chromedriver (Fallback to Latest)
+      - name: Prepare Chromedriver Directory
+        run: mkdir -p ./vendor/laravel/dusk/bin/
+
+      - name: Download Chromedriver for Chrome 114
         run: |
-          CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+' | head -1)
-          MAJOR_VERSION=$(echo "$CHROME_VERSION" | cut -d '.' -f 1)
-          echo "Detected Chrome version: $CHROME_VERSION"
-          echo "Detected Chrome major version: $MAJOR_VERSION"
-      
-          CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$MAJOR_VERSION")
-          if [[ -z "$CHROMEDRIVER_VERSION" || "$CHROMEDRIVER_VERSION" == *"<Error>"* ]]; then
-            echo "No exact Chromedriver version found for Chrome $MAJOR_VERSION. Falling back to the latest Chromedriver."
-            CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
-          fi
-      
-          echo "Using Chromedriver version: $CHROMEDRIVER_VERSION"
-          curl -s -o chromedriver.zip "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
+          CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE_114)
+          echo "Matching Chromedriver version: $CHROMEDRIVER_VERSION"
+          curl -s -o chromedriver.zip https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
           unzip -o chromedriver.zip -d ./vendor/laravel/dusk/bin/
           chmod +x ./vendor/laravel/dusk/bin/chromedriver
 
@@ -127,4 +120,3 @@ jobs:
             docker-compose down
             docker-compose up -d --build
           EOF
-
