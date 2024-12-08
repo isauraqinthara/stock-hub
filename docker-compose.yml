@@ -1,10 +1,12 @@
-version: '3'
+version: '3.8'
+
 services:
   nginx:
-    image: nginx:latest
+    image: nginx:alpine
     container_name: stockhub_nginx
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./public:/var/html/public
     depends_on:
       - app
     networks:
@@ -20,20 +22,13 @@ services:
     env_file:
       - .env
     volumes:
-      - .:/var/www/html
+      - .:/var/html
     ports:
       - "9000:9000"
     depends_on:
       - db
     networks:
       - stockhub-network
-    command: >
-        sh -c "
-        php artisan config:cache &&
-        php artisan migrate --force &&
-        chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache &&
-        php-fpm
-        "
 
   db:
     image: mysql:5.7
