@@ -45,20 +45,28 @@ jobs:
       - name: Debug Google Chrome Version
         run: google-chrome --version
 
-      - name: Download and Use Closest Matching Chromedriver
+      - name: Download Chromedriver
         run: |
           CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+' | head -1)
           MAJOR_VERSION=$(echo "$CHROME_VERSION" | cut -d '.' -f 1)
           echo "Detected Chrome version: $CHROME_VERSION"
-          if [ "$MAJOR_VERSION" -eq 131 ]; then
-            echo "No exact Chromedriver version available for Chrome 131. Attempting to use latest Chromedriver."
-            curl -s -o chromedriver.zip https://chromedriver.storage.googleapis.com/LATEST_RELEASE/chromedriver_linux64.zip
+          echo "Detected Chrome major version: $MAJOR_VERSION"
+      
+          if curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$MAJOR_VERSION" -o chromedriver_version.txt; then
+            CHROMEDRIVER_VERSION=$(cat chromedriver_version.txt)
+            echo "Matching Chromedriver version found: $CHROMEDRIVER_VERSION"
+            curl -s -o chromedriver.zip "https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
           else
-            CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$MAJOR_VERSION)
-            echo "Matching Chromedriver version: $CHROMEDRIVER_VERSION"
-            curl -s -o chromedriver.zip https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
+            echo "No exact Chromedriver version available for Chrome $MAJOR_VERSION. Using the latest Chromedriver instead."
+            curl -s -o chromedriver.zip "https://chromedriver.storage.googleapis.com/LATEST_RELEASE/chromedriver_linux64.zip"
           fi
-          unzip -o chromedriver.zip -d ./vendor/laravel/dusk/bin/
+      
+          # Check if the downloaded file is valid
+          if ! unzip -o chromedriver.zip -d ./vendor/laravel/dusk/bin/; then
+            echo "Failed to unzip Chromedriver. Exiting..."
+            exit 1
+          fi
+      
           chmod +x ./vendor/laravel/dusk/bin/chromedriver
 
       - name: Verify Chromedriver Path
