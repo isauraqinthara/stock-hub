@@ -108,7 +108,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-        - name: Debug SSH Connection
+      - name: Debug SSH Connection
         run: ssh -vvv -o StrictHostKeyChecking=no -i /tmp/vps_key root@217.15.160.69 'echo "Debugging SSH connection"'
 
       - name: Deploy to VPS
