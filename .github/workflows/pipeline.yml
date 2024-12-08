@@ -3,10 +3,10 @@ name: Laravel CI/CD Pipeline
 on:
   push:
     branches:
-      - master
+      - irsyad
   pull_request:
     branches:
-      - master
+      - irsyad
 
 jobs:
   test:
@@ -26,31 +26,32 @@ jobs:
           --health-timeout=5s
           --health-retries=3
         ports:
-          - 3306:3306 
+          - 3306:3306
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Install PHP Extensions
-        run: sudo apt-get install -y php-zip unzip
+        run: sudo apt-get install -y php-zip unzip curl
 
-      - name: Install Google Chrome Version 114
+      - name: Install Google Chrome 114
         run: |
-          sudo apt-get update
-          wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_114.0.5735.90-1_amd64.deb
-          sudo apt-get install -y ./google-chrome-stable_114.0.5735.90-1_amd64.deb
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O google-chrome-stable_114.deb
+          sudo dpkg -i google-chrome-stable_114.deb || sudo apt-get -f install -y
 
-      - name: Verify Installed Google Chrome Version
+      - name: Debug Google Chrome Version
         run: google-chrome --version
 
-      - name: Install ChromeDriver Version 114
+      - name: Download Chromedriver for Chrome 114
         run: |
-          curl -s -o chromedriver.zip https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip
+          CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE_114)
+          echo "Matching Chromedriver version: $CHROMEDRIVER_VERSION"
+          curl -s -o chromedriver.zip https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
           unzip -o chromedriver.zip -d ./vendor/laravel/dusk/bin/
           chmod +x ./vendor/laravel/dusk/bin/chromedriver
 
-      - name: Verify ChromeDriver Installation
+      - name: Verify Chromedriver Path
         run: ls -la ./vendor/laravel/dusk/bin/
 
       - name: Install Dependencies
