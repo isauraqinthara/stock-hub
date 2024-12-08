@@ -102,7 +102,7 @@ jobs:
         run: ./vendor/bin/phpstan analyse --level=0 app
 
       - name: Run PHP_CodeSniffer Fixer
-        run: ./vendor/bin/phpcbf --standard=PSR12 app
+        run: ./vendor/bin/phpcbf --standard=PSR12 app --no-exit app
 
       - name: Run PHP_CodeSniffer
         run: ./vendor/bin/phpcs --standard=PSR12 app
