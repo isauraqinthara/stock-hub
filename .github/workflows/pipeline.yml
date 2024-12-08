@@ -3,10 +3,10 @@ name: Laravel CI/CD Pipeline
 on:
   push:
     branches:
-      - master
+      - ilham
   pull_request:
     branches:
-      - master
+      - ilham
 
 jobs:
   test:
@@ -39,7 +39,7 @@ jobs:
         run: |
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo apt install -y ./google-chrome-stable_current_amd64.deb
-          
+
       - name: Debug Google Chrome Version
         run: google-chrome --version
 
