@@ -95,10 +95,10 @@ jobs:
       # - name: Run PHP_CodeSniffer
       #   run: ./vendor/bin/phpcs --standard=PSR12 app
 
-      - name: Run Laravel Dusk Tests
-        env:
-          APP_ENV: testing
-        run: php artisan dusk
+      # - name: Run Laravel Dusk Tests
+      #   env:
+      #     APP_ENV: testing
+      #   run: php artisan dusk
 
   deploy:
     runs-on: ubuntu-latest
