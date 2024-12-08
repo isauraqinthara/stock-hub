@@ -112,10 +112,12 @@ jobs:
         env:
           SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
         run: |
-          echo "$SSH_KEY" > /tmp/vps_key
-          chmod 600 /tmp/vps_key
-          scp -o StrictHostKeyChecking=no -i /tmp/vps_key -r . root@217.15.160.69:/pso/stock-hub/
+          echo "$SSH_KEY" > /tmp/vps_key || exit 1
+          chmod 600 /tmp/vps_key || exit 1
+          ssh -o StrictHostKeyChecking=no -i /tmp/vps_key root@217.15.160.69 "mkdir -p /pso/stock-hub/" || exit 1
+          rsync -avz --exclude '.git' --exclude '.github' --exclude 'pipeline.yml' ./ root@217.15.160.69:/pso/stock-hub/ || exit 1
           ssh -o StrictHostKeyChecking=no -i /tmp/vps_key root@217.15.160.69 << EOF
             cd /pso/stock-hub/
-            docker-compose down
-            docker-compose up -d --build
+            docker-compose down || exit 1
+            docker-compose up -d --build || exit 1
+          EOF
