@@ -33,14 +33,12 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install PHP Extensions
-        run: sudo apt-get install -y php-zip unzip curl
+        run: sudo apt-get install -y php-zip
 
       - name: Install Google Chrome
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget
-          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          sudo dpkg -i google-chrome-stable_current_amd64.deb || sudo apt-get install -f -y
+          sudo apt-get install -y google-chrome-stable
 
       - name: Debug Google Chrome Version
         run: google-chrome --version
@@ -49,13 +47,23 @@ jobs:
         run: |
           CHROME_VERSION=$(google-chrome --version | grep -oP '\d+' | head -1)
           echo "Detected Chrome version: $CHROME_VERSION"
+          
+          # Coba download versi spesifik Chromedriver
           CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION || echo "NO_VERSION_FOUND")
+          
           if [ "$CHROMEDRIVER_VERSION" = "NO_VERSION_FOUND" ]; then
-            echo "Chromedriver version not found for Chrome version $CHROME_VERSION"
-            exit 1
+            echo "Chromedriver version not found for Chrome version $CHROME_VERSION. Using latest Chromedriver version instead."
+            CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
           fi
+          
           echo "Matching Chromedriver version: $CHROMEDRIVER_VERSION"
           curl -s -o chromedriver.zip https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
+          
+          if [ ! -f chromedriver.zip ]; then
+            echo "Failed to download Chromedriver. Exiting."
+            exit 1
+          fi
+          
           unzip -o chromedriver.zip -d ./vendor/laravel/dusk/bin/
           chmod +x ./vendor/laravel/dusk/bin/chromedriver
 
