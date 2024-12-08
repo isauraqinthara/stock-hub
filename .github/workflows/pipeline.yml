@@ -86,7 +86,7 @@ jobs:
 
       - name: Download Chromedriver for Chrome 114
         run: |
-          CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/)
+          CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE_114)
           echo "Matching Chromedriver version: $CHROMEDRIVER_VERSION"
           curl -s -o chromedriver.zip https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
           unzip -o chromedriver.zip -d ./vendor/laravel/dusk/bin/
