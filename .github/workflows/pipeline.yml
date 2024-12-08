@@ -67,9 +67,9 @@ jobs:
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
         run: |
-          sshpass -p "SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@217.15.160.69 "echo 'Connected using password'"
-          sshpass -p "SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./ root@217.15.160.69:/pso/stock-hub/
-          sshpass -p "SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@217.15.160.69 << EOF
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@217.15.160.69 "echo 'Connected using password'"
+          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./ root@217.15.160.69:/pso/stock-hub/
+          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@217.15.160.69 << EOF
             cd /pso/stock-hub/
             docker-compose down
             docker-compose up -d --build
