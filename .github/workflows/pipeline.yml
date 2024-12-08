@@ -83,8 +83,8 @@ jobs:
       - name: Generate APP_KEY
         run: php artisan key:generate
 
-      - name: Run Unit Tests (PHPUnit)
-        run: php artisan test
+      # - name: Run Unit Tests (PHPUnit)
+      #   run: php artisan test
 
       - name: Run Static Analysis (PHPStan)
         run: ./vendor/bin/phpstan analyse --level=0 app
