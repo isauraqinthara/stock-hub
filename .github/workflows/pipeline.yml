@@ -61,9 +61,9 @@ jobs:
         run: echo "Checking SSH Key exists"
         env:
           SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          echo "$SSH_KEY" > debug_key.txt
-
+          
+        run: echo "$SSH_KEY" > debug_key.txt
+              
       - name: Print Current Directory
         run: pwd
 
