@@ -110,6 +110,18 @@ jobs:
       - name: Run PHP_CodeSniffer
         run: ./vendor/bin/phpcs --standard=PSR12 app
 
+      - name: Start Laravel Server
+        run: php artisan serve --host=127.0.0.1 --port=8000 > /dev/null 2>&1 &
+
+      - name: Update APP_URL for Laravel Dusk
+        run: sed -i 's|APP_URL=.*|APP_URL=http://127.0.0.1:8000|' .env
+
+      - name: Wait for Laravel Server to Start
+        run: sleep 5
+
+      - name: Check Laravel Server
+        run: curl -I http://127.0.0.1:8000
+
       - name: Run Laravel Dusk Tests
         env:
           APP_ENV: testing
