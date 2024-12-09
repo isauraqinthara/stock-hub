@@ -57,50 +57,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Langkah debugging untuk memeriksa apakah secret SSH key tersedia
-      - name: Debug Secret
-        run: echo "Checking SSH Key exists"
-        env:
-          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      # Menyimpan SSH key ke file untuk debugging
-      - name: Save Debug Key to File
-        run: echo "$SSH_KEY" > debug_key.txt
-              
-      # Menampilkan direktori saat ini
+      # Debugging environment
       - name: Print Current Directory
         run: pwd
 
-      # Melist file dalam direktori saat ini
       - name: List Files in Current Directory
         run: ls -la
 
-      # Mengambil kode dari repository
+      # Checkout kode
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Menginstal sshpass untuk koneksi SSH dengan password
+      # Install sshpass
       - name: Install sshpass
         run: sudo apt-get update && sudo apt-get install -y sshpass
 
-      # Verifikasi apakah sshpass berhasil diinstal
-      - name: Verify sshpass Installation
-        run: sshpass -V
+      # Arsipkan semua file sebelum deploy
+      - name: Archive Files for Deployment
+        run: tar -czf stock-hub.tar.gz .
 
-      # Menggunakan sshpass untuk proses deploy
+      # Salin file arsip ke VPS
       - name: Deploy to VPS using Password
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
         run: |
           # Tes koneksi SSH dengan password
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@217.15.160.69 "echo 'Connected using password'"
-          
+
           # Copy file ke VPS
-          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./ root@217.15.160.69:/pso/stock-hub/
-          
+          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no stock-hub.tar.gz root@217.15.160.69:/tmp/
+
           # Jalankan perintah docker-compose di VPS
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@217.15.160.69 << EOF
             cd /pso/stock-hub/
+            tar -xzf /tmp/stock-hub.tar.gz -C .
             docker-compose down
             docker-compose up -d --build
           EOF
