@@ -1,10 +1,8 @@
-name: Laravel CI/CD Pipeline
+name: Deploy to VPS
 
 on:
+  # Workflow ini akan berjalan saat ada push ke branch master
   push:
-    branches:
-      - master
-  pull_request:
     branches:
       - master
 
@@ -57,40 +55,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Debugging environment
-      - name: Print Current Directory
-        run: pwd
-
-      - name: List Files in Current Directory
-        run: ls -la
-
-      # Checkout kode
+      # Step: Checkout repository
+      # Mengambil kode dari repository GitHub ke runner
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Install sshpass
+      # Step: Install sshpass
+      # Menginstal sshpass untuk autentikasi SCP tanpa interaksi manual
       - name: Install sshpass
         run: sudo apt-get update && sudo apt-get install -y sshpass
 
-      # Arsipkan semua file sebelum deploy
+      # Step: Wait for File System Stability
+      # Memberikan waktu untuk memastikan file system stabil sebelum membuat arsip
+      - name: Wait for File System Stability
+        run: sleep 2
+
+      # Step: Archive Files for Deployment
+      # Membuat file arsip dengan mengabaikan direktori `.git` dan file sementara
       - name: Archive Files for Deployment
-        run: tar -czf stock-hub.tar.gz .
+        run: tar --exclude='.git' --exclude='tmp' --warning=no-file-changed -czf stock-hub.tar.gz .
 
-      # Salin file arsip ke VPS
-      - name: Deploy to VPS using Password
+      # Step: Deploy to VPS
+      # Menggunakan sshpass untuk mentransfer file arsip ke server VPS dan menjalankan docker-compose
+      - name: Deploy to VPS
         env:
-          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }} # Mengambil password SSH dari GitHub Secrets
         run: |
-          # Tes koneksi SSH dengan password
-          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@217.15.160.69 "echo 'Connected using password'"
-
-          # Copy file ke VPS
+          # Mengunggah file arsip ke server VPS
           sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no stock-hub.tar.gz root@217.15.160.69:/tmp/
 
-          # Jalankan perintah docker-compose di VPS
+          # Mengekstrak file arsip dan menjalankan aplikasi di server VPS
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@217.15.160.69 << EOF
+            # Pindah ke direktori aplikasi
             cd /pso/stock-hub/
+
+            # Mengekstrak file arsip dari /tmp ke direktori saat ini
             tar -xzf /tmp/stock-hub.tar.gz -C .
+
+            # Menjalankan ulang aplikasi menggunakan docker-compose
             docker-compose down
             docker-compose up -d --build
           EOF
