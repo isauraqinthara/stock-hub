@@ -92,6 +92,9 @@ jobs:
           unzip -o chromedriver.zip -d ./vendor/laravel/dusk/bin/
           chmod +x ./vendor/laravel/dusk/bin/chromedriver
 
+      - name: Rename Chromedriver
+        run: mv ./vendor/laravel/dusk/bin/chromedriver ./vendor/laravel/dusk/bin/chromedriver-linux
+      
       - name: Verify Chromedriver Path
         run: ls -la ./vendor/laravel/dusk/bin/
 
