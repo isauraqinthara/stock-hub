@@ -88,9 +88,7 @@ jobs:
         run: |
           curl -s -o chromedriver.zip https://storage.googleapis.com/chrome-for-testing-public/131.0.6778.87/linux64/chromedriver-linux64.zip
           unzip -o chromedriver.zip -d ./vendor/laravel/dusk/bin/
-          mv ./vendor/laravel/dusk/bin/chromedriver ./vendor/laravel/dusk/bin/chromedriver-linux
           chmod +x ./vendor/laravel/dusk/bin/chromedriver-linux
-
       
       - name: Verify Chromedriver Path
         run: ls -la ./vendor/laravel/dusk/bin/
