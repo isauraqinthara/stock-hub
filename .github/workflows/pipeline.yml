@@ -57,31 +57,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Langkah debugging untuk memeriksa apakah secret SSH key tersedia
       - name: Debug Secret
         run: echo "Checking SSH Key exists"
         env:
           SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          
+
+      # Menyimpan SSH key ke file untuk debugging
+      - name: Save Debug Key to File
         run: echo "$SSH_KEY" > debug_key.txt
               
+      # Menampilkan direktori saat ini
       - name: Print Current Directory
         run: pwd
 
+      # Melist file dalam direktori saat ini
       - name: List Files in Current Directory
         run: ls -la
 
+      # Mengambil kode dari repository
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      # Menginstal sshpass untuk koneksi SSH dengan password
       - name: Install sshpass
         run: sudo apt-get update && sudo apt-get install -y sshpass
 
+      # Verifikasi apakah sshpass berhasil diinstal
+      - name: Verify sshpass Installation
+        run: sshpass -V
+
+      # Menggunakan sshpass untuk proses deploy
       - name: Deploy to VPS using Password
         env:
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
         run: |
+          # Tes koneksi SSH dengan password
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@217.15.160.69 "echo 'Connected using password'"
+          
+          # Copy file ke VPS
           sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./ root@217.15.160.69:/pso/stock-hub/
+          
+          # Jalankan perintah docker-compose di VPS
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@217.15.160.69 << EOF
             cd /pso/stock-hub/
             docker-compose down
