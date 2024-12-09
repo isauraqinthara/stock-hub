@@ -57,13 +57,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Debug Secret
+        run: echo "Checking SSH Key exists"
+        env:
+          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          echo "$SSH_KEY" > debug_key.txt
 
       - name: Print Current Directory
         run: pwd
 
       - name: List Files in Current Directory
         run: ls -la
-        
+
       - name: Checkout Code
         uses: actions/checkout@v3
 
