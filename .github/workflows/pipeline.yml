@@ -161,10 +161,17 @@ jobs:
             php artisan migrate --force || echo 'Migration failed!'
           "
 
-      # Reload Web Server
-      - name: Reload Web Server
+      - name: Debug Nginx
         run: |
-          ssh root@217.15.160.69 "
-          systemctl reload nginx || systemctl restart nginx
-          "
+            ssh root@217.15.160.69 "
+              systemctl status nginx.service;
+              nginx -t || echo 'Nginx configuration is invalid!';
+            "
+  
+      # Reload or Restart Nginx
+      - name: Reload or Restart Nginx
+        run: |
+            ssh root@217.15.160.69 "
+              systemctl reload nginx || systemctl restart nginx;
+            "
 
