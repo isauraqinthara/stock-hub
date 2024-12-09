@@ -93,7 +93,9 @@ jobs:
         run: mv ./vendor/laravel/dusk/bin/chromedriver-linux64 ./vendor/laravel/dusk/bin/chromedriver-linux
 
       - name: Ensure Chromedriver is Executable
-        run: chmod +x ./vendor/laravel/dusk/bin/chromedriver-linux
+        run: |
+          chmod +x ./vendor/laravel/dusk/bin/chromedriver-linux
+          chmod +x ./vendor/laravel/dusk/bin/chromedriver-linux64
 
       - name: Verify Chromedriver Path
         run: ls -la ./vendor/laravel/dusk/bin/
