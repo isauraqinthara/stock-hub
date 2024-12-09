@@ -103,6 +103,7 @@ jobs:
 
       - name: Run PHP_CodeSniffer Fixer
         run: ./vendor/bin/phpcbf --standard=PSR12 app
+        continue-on-error: true
 
       - name: Run PHP_CodeSniffer
         run: ./vendor/bin/phpcs --standard=PSR12 app
