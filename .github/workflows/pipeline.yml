@@ -1,83 +1,42 @@
-name: Laravel CI/CD Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
       - master
-  pull_request:
-    branches:
-      - master
 
 jobs:
-  # Job test dikomentari
-  # test:
-  #   runs-on: ubuntu-latest
-
-  #   services:
-  #     mysql:
-  #       image: mysql:5.7
-  #       env:
-  #         MYSQL_DATABASE: stockhub
-  #         MYSQL_USER: stockhubuser
-  #         MYSQL_PASSWORD: stockhubpassword
-  #         MYSQL_ROOT_PASSWORD: rootpassword
-  #       options: >-
-  #         --health-cmd="mysqladmin ping -h 127.0.0.1 --silent"
-  #         --health-interval=10s
-  #         --health-timeout=5s
-  #         --health-retries=3
-  #       ports:
-  #         - 3306:3306
-
-  #   steps:
-  #     - name: Checkout Code
-  #       uses: actions/checkout@v3
-
-  #     - name: Install Dependencies
-  #       run: composer install --no-interaction --prefer-dist
-
-  #     - name: Configure Testing Environment
-  #       run: |
-  #         cp .env.example .env
-  #         sed -i 's/DB_DATABASE=.*/DB_DATABASE=stockhub/' .env
-  #         sed -i 's/DB_USERNAME=.*/DB_USERNAME=stockhubuser/' .env
-  #         sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=stockhubpassword/' .env
-
-  #     - name: Run Database Migrations
-  #       env:
-  #         DB_CONNECTION: mysql
-  #         DB_HOST: 127.0.0.1
-  #         DB_PORT: 3306
-  #         DB_DATABASE: stockhub
-  #         DB_USERNAME: stockhubuser
-  #         DB_PASSWORD: stockhubpassword
-  #       run: php artisan migrate --force
-
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-
-      - name: Print Current Directory
-        run: pwd
-
-      - name: List Files in Current Directory
-        run: ls -la
-        
+      # Checkout Repository
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Install sshpass
-        run: sudo apt-get update && sudo apt-get install -y sshpass
-
-      - name: Deploy to VPS using Password
-        env:
-          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+      # Extract SSH Key
+      - name: Extract SSH Key
         run: |
-          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@217.15.160.69 "echo 'Connected using password'"
-          sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r ./ root@217.15.160.69:/pso/stock-hub/
-          sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@217.15.160.69 << EOF
-            cd /pso/stock-hub/
-            docker-compose down
-            docker-compose up -d --build
-          EOF
+          mkdir -p ~/.ssh
+          tar -xvf key.tar.gz -C ~/.ssh
+          chmod 600 ~/.ssh/id_rsa
+          echo -e "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+
+      # Install Dependencies
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rsync
+
+      # Deploy Code to VPS
+      - name: Deploy to VPS
+        env:
+          DEPLOY_PATH: /pso/stock-hub
+        run: |
+          rsync -avz --exclude '.git' --exclude 'key.tar.gz' ./ root@217.15.160.69:${{ env.DEPLOY_PATH }}
+          ssh root@217.15.160.69 "cd ${{ env.DEPLOY_PATH }} && composer install && php artisan migrate --force"
+
+      # Reload Web Server
+      - name: Reload Web Server
+        run: |
+          ssh root@217.15.160.69 "systemctl reload nginx"
