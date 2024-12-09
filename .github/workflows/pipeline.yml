@@ -81,8 +81,8 @@ jobs:
       - name: Debug Google Chrome Version
         run: google-chrome --version
 
-      - name: Prepare Chromedriver Directory
-        run: mkdir -p ./vendor/laravel/dusk/bin/
+      - name: Install Laravel Dusk ChromeDriver
+        run: php artisan dusk:chrome-driver
 
       - name: Download Chromedriver for Chrome 114
         run: |
