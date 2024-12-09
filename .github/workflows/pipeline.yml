@@ -93,7 +93,7 @@ jobs:
           chmod +x ./vendor/laravel/dusk/bin/chromedriver
 
       - name: Rename Chromedriver
-        run: mv ./vendor/laravel/dusk/bin/chromedriver ./vendor/laravel/dusk/bin/chromedriver-linux
+        run: mv ./vendor/laravel/dusk/bin/chromedriver-linux64 ./vendor/laravel/dusk/bin/chromedriver-linux
       
       - name: Verify Chromedriver Path
         run: ls -la ./vendor/laravel/dusk/bin/
