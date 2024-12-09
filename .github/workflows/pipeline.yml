@@ -89,10 +89,11 @@ jobs:
           curl -s -o chromedriver.zip https://storage.googleapis.com/chrome-for-testing-public/131.0.6778.87/linux64/chromedriver-linux64.zip
           unzip -o chromedriver.zip -d ./vendor/laravel/dusk/bin/
       
-      - name: Rename Chromedriver-linux64 to Chromedriver-linux and make it executable
-        run: |
-          mv ./vendor/laravel/dusk/bin/chromedriver-linux64 ./vendor/laravel/dusk/bin/chromedriver-linux
-          chmod +x ./vendor/laravel/dusk/bin/chromedriver-linux
+      - name: Rename Chromedriver-linux64 to Chromedriver-linux 
+        run: mv ./vendor/laravel/dusk/bin/chromedriver-linux64 ./vendor/laravel/dusk/bin/chromedriver-linux
+
+      - name: Ensure Chromedriver is Executable
+        run: chmod +x ./vendor/laravel/dusk/bin/chromedriver-linux
 
       - name: Start ChromeDriver
         run: nohup ./vendor/laravel/dusk/bin/chromedriver-linux --port=9515 &
