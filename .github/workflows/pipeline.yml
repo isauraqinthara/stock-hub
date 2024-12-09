@@ -3,10 +3,10 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - ilham
+      - master
   pull_request:
     branches:
-      - ilham
+      - master
 
 jobs:
   test:
