@@ -86,14 +86,22 @@ jobs:
 
       - name: Download Chromedriver for Chrome 114
         run: |
-          CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE_114)
-          echo "Matching Chromedriver version: $CHROMEDRIVER_VERSION"
+          CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+' | head -1)
+          CHROME_MAJOR=$(echo $CHROME_VERSION | cut -d '.' -f 1)
+          echo "Detected Chrome version: $CHROME_VERSION"
+          if [ "$CHROME_MAJOR" -eq "131" ]; then
+            CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE_131)
+          else
+            CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_MAJOR})
+          fi
+          echo "Matching ChromeDriver version: $CHROMEDRIVER_VERSION"
           curl -s -o chromedriver.zip https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
           unzip -o chromedriver.zip -d ./vendor/laravel/dusk/bin/
-          chmod +x ./vendor/laravel/dusk/bin/chromedriver
+          mv ./vendor/laravel/dusk/bin/chromedriver ./vendor/laravel/dusk/bin/chromedriver-linux
+          chmod +x ./vendor/laravel/dusk/bin/chromedriver-linux
 
       - name: Rename Chromedriver
-        run: mv ./vendor/laravel/dusk/bin/chromedriver-linux64 ./vendor/laravel/dusk/bin/chromedriver-linux
+        run: mv ./vendor/laravel/dusk/bin/chromedriver ./vendor/laravel/dusk/bin/chromedriver-linux
       
       - name: Verify Chromedriver Path
         run: ls -la ./vendor/laravel/dusk/bin/
