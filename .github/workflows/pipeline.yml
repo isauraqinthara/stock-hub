@@ -94,6 +94,13 @@ jobs:
           mv ./vendor/laravel/dusk/bin/chromedriver-linux64 ./vendor/laravel/dusk/bin/chromedriver-linux
           chmod +x ./vendor/laravel/dusk/bin/chromedriver-linux
 
+      - name: Start ChromeDriver
+        run: nohup ./vendor/laravel/dusk/bin/chromedriver-linux --port=9515 &
+  
+      - name: Debug ChromeDriver Port
+        run: netstat -tuln | grep 9515
+  
+
       - name: Verify Chromedriver Path
         run: ls -la ./vendor/laravel/dusk/bin/
 
