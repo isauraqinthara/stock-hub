@@ -1,0 +1,4 @@
+queries:
+  - security-and-quality
+  - maintainability
+  - code-scanning.queries.yaml
